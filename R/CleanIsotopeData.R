@@ -57,7 +57,7 @@ ggplot(IsotopeSub, aes_string("Elevation", "delC", group="Group")) +
   scale_shape_manual(values=rep(21:25, 5))  + 
   scale_fill_manual(values = colors) + 
   scale_colour_manual(values = colors) +
-  geom_smooth(method='lm', alpha=0.2, aes(fill=Group, colour=Group)) +
+  geom_smooth(method='lm', alpha=0.2, se=F, aes(fill=Group, colour=Group)) +
   geom_jitter(size=2, width=40, aes(fill=Group, shape=Group)) + 
   theme_bw() +
   theme(plot.title = element_text(hjust=0.5))  +
@@ -73,7 +73,7 @@ ggplot(IsotopeSub[is.finite(IsotopeSub$delN),], aes_string("Elevation", "delN", 
   scale_shape_manual(values=rep(21:25, 5))  + 
   scale_fill_manual(values = colors) + 
   scale_colour_manual(values = colors) +
-  geom_smooth(method='lm', alpha=0.2, aes(fill=Group, colour=Group)) +
+  geom_smooth(method='lm', alpha=0.2, se=F, aes(fill=Group, colour=Group)) +
   geom_jitter(size=2, width=40, aes(fill=Group, shape=Group)) + 
   theme_bw() +
   theme(plot.title = element_text(hjust=0.5))  +
@@ -89,7 +89,7 @@ ggplot(IsotopeSub[is.finite(IsotopeSub$delH),], aes_string("Elevation", "delH", 
   scale_shape_manual(values=rep(21:25, 5))  + 
   scale_fill_manual(values = colors) + 
   scale_colour_manual(values = colors) +
-  geom_smooth(method='lm', alpha=0.2, aes(color=Group, fill=Group)) +
+  geom_smooth(method='lm', alpha=0.2, se=F, aes(color=Group, fill=Group)) +
   geom_jitter(size=2, width=40, aes(fill=Group, shape=Group)) + 
   theme_bw() +
   theme(plot.title = element_text(hjust=0.5))  +
