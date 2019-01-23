@@ -27,6 +27,10 @@ IsotopeAll<-CompiledDataAll$`Compiled isotope data solids`
 
 IsotopeAll$Elevation<-LakeSummary$Elevation[match(IsotopeAll$`Lake`, LakeSummary$`Lake Name`)]
 
+IsotopeAll$CO2Sat<-LakeSummary$"CO2 %sat"[match(IsotopeAll$`Lake`, LakeSummary$`Lake Name`)]
+
+plot(IsotopeAll$CO2Sat, IsotopeAll$Elevation)
+
 
 plot(IsotopeAll$Elevation2, IsotopeAll$"δ13C ‰ vs VPD")
 points(IsotopeAll$Elevation, IsotopeAll$"δ13C ‰ vs VPD", col='red')
@@ -41,6 +45,7 @@ IsotopeSub$Depth<-IsotopeSub$`Max Depth`
 IsotopeSub$delC<-IsotopeSub$"δ13C ‰ vs VPD"
 IsotopeSub$delN<-IsotopeSub$"δ15N ‰ vs Air-N2"
 IsotopeSub$delH<-IsotopeSub$"δ2H\r\n(per mil vs. VSMOW)"
+
 
 
 color.palette = colorRampPalette(c(viridis(6, begin=.2, end=.98), rev(magma(5, begin=.35, end=.98))), bias=1)
@@ -96,3 +101,102 @@ ggplot(IsotopeSub[is.finite(IsotopeSub$delH),], aes_string("Elevation", "delH", 
   theme(legend.position='bottom')
 
 dev.off()
+
+
+#Vs CO2 concentration
+
+
+
+png(paste0(box_dir, '/Figures/delC_vCO2facet.png'), units='in', width=10, height=10, res=400, bg='white')
+
+
+ggplot(IsotopeSub, aes_string("CO2Sat", "delC", group="Group")) + 
+  scale_shape_manual(values=rep(21:25, 5))  + 
+  scale_fill_manual(values = colors) + 
+  scale_colour_manual(values = colors) +
+  geom_smooth(method='lm', alpha=0.2, se=F, aes(fill=Group, colour=Group)) +
+  geom_jitter(size=2, width=0, aes(fill=Group, shape=Group)) + 
+  theme_bw() +
+  theme(plot.title = element_text(hjust=0.5))  +
+  theme(legend.position='bottom') + 
+  # geom_point(size=2, width=40, aes_string(data=IsotopeSub[IsotopeSub$Group=='DIC',] , x="CO2Sat", y="delC"), fill='black', col='black') 
+  facet_wrap(Group ~ .)
+
+dev.off()
+
+
+png(paste0(box_dir, '/Figures/delC_vCO2.png'), units='in', width=5, height=5, res=400, bg='white')
+
+ggplot(IsotopeSub, aes_string("CO2Sat", "delC", group="Group")) + 
+  scale_shape_manual(values=rep(21:25, 5))  + 
+  scale_fill_manual(values = colors) + 
+  scale_colour_manual(values = colors) +
+  geom_smooth(method='lm', alpha=0.2, se=F, aes(fill=Group, colour=Group)) +
+  geom_jitter(size=2, width=40, aes(fill=Group, shape=Group)) + 
+  theme_bw() +
+  theme(plot.title = element_text(hjust=0.5))  +
+  theme(legend.position='bottom')
+
+dev.off()
+
+
+
+
+png(paste0(box_dir, '/Figures/delC_vElevationfacet.png'), units='in', width=10, height=10, res=400, bg='white')
+
+
+ggplot(IsotopeSub, aes_string("Elevation", "delC", group="Group")) + 
+  scale_shape_manual(values=rep(21:25, 5))  + 
+  scale_fill_manual(values = colors) + 
+  scale_colour_manual(values = colors) +
+  geom_smooth(method='lm', alpha=0.2, se=F, aes(fill=Group, colour=Group)) +
+  geom_jitter(size=2, width=0, aes(fill=Group, shape=Group)) + 
+  theme_bw() +
+  theme(plot.title = element_text(hjust=0.5))  +
+  theme(legend.position='bottom') + 
+  # geom_point(size=2, width=40, aes_string(data=IsotopeSub[IsotopeSub$Group=='DIC',] , x="CO2Sat", y="delC"), fill='black', col='black') 
+  facet_wrap(Group ~ .)
+
+dev.off()
+
+
+
+png(paste0(box_dir, '/Figures/delH_vElevationfacet.png'), units='in', width=10, height=10, res=400, bg='white')
+
+
+ggplot(IsotopeSub[is.finite(IsotopeSub$delH),], aes_string("Elevation", "delH", group="Group")) + 
+  scale_shape_manual(values=rep(21:25, 5))  + 
+  scale_fill_manual(values = colors) + 
+  scale_colour_manual(values = colors) +
+  geom_smooth(method='lm', alpha=0.2, se=F, aes(fill=Group, colour=Group)) +
+  geom_jitter(size=2, width=0, aes(fill=Group, shape=Group)) + 
+  theme_bw() +
+  theme(plot.title = element_text(hjust=0.5))  +
+  theme(legend.position='bottom') + 
+  scale_y_continuous(limits=c(-300,-100)) + 
+  # geom_point(size=2, width=40, aes_string(data=IsotopeSub[IsotopeSub$Group=='DIC',] , x="CO2Sat", y="delC"), fill='black', col='black') 
+  facet_wrap(Group ~ .)
+
+dev.off()
+
+
+
+png(paste0(box_dir, '/Figures/delH_vCO2Satfacet.png'), units='in', width=10, height=10, res=400, bg='white')
+
+
+ggplot(IsotopeSub[is.finite(IsotopeSub$delH),], aes_string("CO2Sat", "delH", group="Group")) + 
+  scale_shape_manual(values=rep(21:25, 5))  + 
+  scale_fill_manual(values = colors) + 
+  scale_colour_manual(values = colors) +
+  geom_smooth(method='lm', alpha=0.2, se=F, aes(fill=Group, colour=Group)) +
+  geom_jitter(size=2, width=0, aes(fill=Group, shape=Group)) + 
+  theme_bw() +
+  theme(plot.title = element_text(hjust=0.5))  +
+  theme(legend.position='bottom') + 
+  scale_y_continuous(limits=c(-300,-100)) + 
+  # geom_point(size=2, width=40, aes_string(data=IsotopeSub[IsotopeSub$Group=='DIC',] , x="CO2Sat", y="delC"), fill='black', col='black') 
+  facet_wrap(Group ~ .)
+
+dev.off()
+
+
