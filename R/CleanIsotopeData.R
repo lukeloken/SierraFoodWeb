@@ -28,11 +28,11 @@ IsotopeAll<-CompiledDataAll$`Compiled isotope data solids`
 IsotopeAll$Elevation<-LakeSummary$Elevation[match(IsotopeAll$`Lake`, LakeSummary$`Lake Name`)]
 
 IsotopeAll$CO2Sat<-LakeSummary$"CO2 %sat"[match(IsotopeAll$`Lake`, LakeSummary$`Lake Name`)]
+IsotopeAll$CO2uM<-LakeSummary$"CO2 uM"[match(IsotopeAll$`Lake`, LakeSummary$`Lake Name`)]
 
 plot(IsotopeAll$CO2Sat, IsotopeAll$Elevation)
+plot(IsotopeAll$CO2uM, IsotopeAll$Elevation)
 
-
-plot(IsotopeAll$Elevation2, IsotopeAll$"δ13C ‰ vs VPD")
 points(IsotopeAll$Elevation, IsotopeAll$"δ13C ‰ vs VPD", col='red')
 
 
