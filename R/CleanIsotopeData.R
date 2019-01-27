@@ -4,6 +4,7 @@
 library(readxl)
 library(plyr)
 library(dplyr)
+library(tidyr)
 library(viridis)
 library(lubridate)
 library(ggplot2)
@@ -29,11 +30,12 @@ IsotopeAll$Elevation<-LakeSummary$Elevation[match(IsotopeAll$`Lake`, LakeSummary
 
 IsotopeAll$CO2Sat<-LakeSummary$"CO2 %sat"[match(IsotopeAll$`Lake`, LakeSummary$`Lake Name`)]
 IsotopeAll$CO2uM<-LakeSummary$"CO2 uM"[match(IsotopeAll$`Lake`, LakeSummary$`Lake Name`)]
+IsotopeAll$pH_field<-LakeSummary$`pH Field`[match(IsotopeAll$`Lake`, LakeSummary$`Lake Name`)]
+IsotopeAll$pH_lab<-LakeSummary$`pH lab`[match(IsotopeAll$`Lake`, LakeSummary$`Lake Name`)]
+
 
 plot(IsotopeAll$CO2Sat, IsotopeAll$Elevation)
 plot(IsotopeAll$CO2uM, IsotopeAll$Elevation)
-
-points(IsotopeAll$Elevation, IsotopeAll$"δ13C ‰ vs VPD", col='red')
 
 
 IsotopeSub<-IsotopeAll[IsotopeAll$`Sample type` %in% c('Zooplankton', 'DIC', 'Sediment abyssal', 'POM', 'DOC', 'Terrestrial veg', 'Fish', 'SAP', 'EAP', 'Aquatic Insect', 'Benthic Infauna'),]
@@ -111,6 +113,25 @@ png(paste0(box_dir, '/Figures/delC_vCO2facet.png'), units='in', width=10, height
 
 
 ggplot(IsotopeSub, aes_string("CO2Sat", "delC", group="Group")) + 
+  scale_shape_manual(values=rep(21:25, 5))  + 
+  scale_fill_manual(values = colors) + 
+  scale_colour_manual(values = colors) +
+  geom_smooth(method='lm', alpha=0.2, se=F, aes(fill=Group, colour=Group)) +
+  geom_jitter(size=2, width=0, aes(fill=Group, shape=Group)) + 
+  theme_bw() +
+  theme(plot.title = element_text(hjust=0.5))  +
+  theme(legend.position='bottom') + 
+  # geom_point(size=2, width=40, aes_string(data=IsotopeSub[IsotopeSub$Group=='DIC',] , x="CO2Sat", y="delC"), fill='black', col='black') 
+  facet_wrap(Group ~ .)
+
+dev.off()
+
+
+
+png(paste0(box_dir, '/Figures/delC_vpHfacet.png'), units='in', width=10, height=10, res=400, bg='white')
+
+
+ggplot(IsotopeSub, aes_string("pH_field", "delC", group="Group")) + 
   scale_shape_manual(values=rep(21:25, 5))  + 
   scale_fill_manual(values = colors) + 
   scale_colour_manual(values = colors) +
