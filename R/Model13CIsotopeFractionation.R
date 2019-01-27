@@ -33,29 +33,61 @@ Ep_Smyntek <- function (CO2_uM){
 
 Ep_Smyntek(20)
 
+CIsotopeSummary<- IsotopeSub %>%
+  select(Group, Lake, delC) %>%
+  group_by(Group, Lake) %>%
+  dplyr::summarize_all(mean, na.rm=T) %>%
+  spread(key=Group, value=delC)
+  
 LakeSummary$Ep<-Ep_Smyntek(LakeSummary$`CO2 uM`)
+LakeSummary$Lake = LakeSummary$'Lake Name'
 
 LakeSummary$Phyto_ExpectedD13<-LakeSummary$'d13C DIC'-LakeSummary$Ep
 
-LakeSummary$POM_ObservedD13<-IsotopeSub$"δ13C ‰ vs VPD"[match(LakeSummary$`Lake Name`, IsotopeSub$Lake)]
+LakeSummary2<-full_join(LakeSummary, CIsotopeSummary)
+
+LakeSummary2$PhytoExpected_Epi<-LakeSummary2$DIC-LakeSummary2$Ep
+
+# LakeSummary$Sediment_ObservedD13<-IsotopeSub$"δ13C ‰ vs VPD"[match(LakeSummary$`Lake Name`, IsotopeSub$Lake)]
 
 
 png(paste0(box_dir, '/Figures/Expected_delC_Phyto.png'), units='in', width=5, height=4, res=400, bg='white')
 par(mar=c(3,3,.5,.5), mgp=c(2,.3,0), tck=-.01)
-plot(LakeSummary$`CO2 uM`, LakeSummary$Phyto_ExpectedD13, ylim=c(-38,5), bg='green', pch=21, ylab='', xlab='', las=1)
-points(LakeSummary$`CO2 uM`, LakeSummary$'d13C DIC', col='black', pch=2)
-points(LakeSummary$`CO2 uM`, LakeSummary$POM_ObservedD13, bg='darkgreen', pch=21)
-points(LakeSummary$`CO2 uM`, LakeSummary$`d13C DOM`, bg='orange', pch=22)
+plot(LakeSummary2$`CO2 uM`, LakeSummary2$'d13C DIC', col='black', pch=2, ylim=c(-38,5), ylab='', xlab='', las=1)
+arrows(x0=LakeSummary2$`CO2 uM`, y0=LakeSummary2$'d13C DIC', y1=LakeSummary2$PhytoExpected_Epi, length=0.1, lty=1, col='grey')
+# 
+# points(LakeSummary2$`CO2 uM`, LakeSummary2$DOC, bg='orange', pch=22)
+# points(LakeSummary2$`CO2 uM`, LakeSummary2$`Sediment abyssal`, bg='brown', pch=23)
+# points(LakeSummary2$`CO2 uM`, LakeSummary2$Zooplankton, bg='purple', pch=24)
+points(LakeSummary2$`CO2 uM`, LakeSummary2$PhytoExpected_Epi, pch=8, col='darkgreen')
+points(LakeSummary2$`CO2 uM`, LakeSummary2$POM, bg='green3', pch=21)
 
-
-arrows(x0=LakeSummary$`CO2 uM`, y0=LakeSummary$'d13C DIC', y1=LakeSummary$Phyto_ExpectedD13, length=0.1, lty=2)
-
-legend('topleft', inset=0.02, c('DIC', 'Expected Phyto', 'Observed POM', 'Observed DOM'), pch=c(2,21,21, 22), col='black', pt.bg=c('black', 'green1', 'darkgreen', 'orange'), bty='n', ncol=2)
+legend('topleft', inset=0.02, c('Epilimnion DIC', 'Expected Phyto', 'Observed POM'), pch=c(2,8,21), col=c('black', 'darkgreen', 'black'), pt.bg=c('green1'), bty='n', ncol=2)
 
 mtext(expression(paste(CO[2], ' (', mu, 'M)', sep='')), 1, 1.5)
 mtext(expression(paste(delta, ''^'13', 'C (', "\u2030", ')', sep='')), 2, 1.5)
 
 dev.off()
+
+
+png(paste0(box_dir, '/Figures/Expected_delC_Phyto_withgroups.png'), units='in', width=5, height=4, res=400, bg='white')
+par(mar=c(3,3,.5,.5), mgp=c(2,.3,0), tck=-.01)
+plot(LakeSummary2$`CO2 uM`, LakeSummary2$'d13C DIC', col='black', pch=2, ylim=c(-38,5), ylab='', xlab='', las=1)
+arrows(x0=LakeSummary2$`CO2 uM`, y0=LakeSummary2$'d13C DIC', y1=LakeSummary2$PhytoExpected_Epi, length=0.1, lty=1, col='grey')
+
+points(LakeSummary2$`CO2 uM`, LakeSummary2$DOC, bg='orange', pch=22)
+points(LakeSummary2$`CO2 uM`, LakeSummary2$`Sediment abyssal`, bg='brown', pch=23)
+points(LakeSummary2$`CO2 uM`, LakeSummary2$Zooplankton, bg='purple', pch=24)
+points(LakeSummary2$`CO2 uM`, LakeSummary2$PhytoExpected_Epi, pch=8, col='darkgreen')
+points(LakeSummary2$`CO2 uM`, LakeSummary2$POM, bg='green3', pch=21)
+
+legend('topleft', inset=0.02, c('Epilimnion DIC', 'Expected Phyto', 'Observed POM', 'Observed DOM', 'Sediments', 'Zoops'), pch=c(2,8,21, 22, 23, 24), col='black', pt.bg=c('black', 'green1', 'darkgreen', 'orange', 'brown', 'purple'), bty='n', ncol=3)
+
+mtext(expression(paste(CO[2], ' (', mu, 'M)', sep='')), 1, 1.5)
+mtext(expression(paste(delta, ''^'13', 'C (', "\u2030", ')', sep='')), 2, 1.5)
+
+dev.off()
+
 
 
 IsotopeSub$Ep<-Ep_Smyntek(IsotopeSub$CO2uM)
