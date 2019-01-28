@@ -89,6 +89,15 @@ mtext(expression(paste(delta, ''^'13', 'C (', "\u2030", ')', sep='')), 2, 1.5)
 dev.off()
 
 
+png(paste0(box_dir, '/Figures/FractionactionVCO2_Scatter.png'), units='in', width=5, height=4, res=400, bg='white')
+par(mar=c(3,3,.5,.5), mgp=c(2,.3,0), tck=-.01)
+
+plot(LakeSummary2$`CO2 uM`, LakeSummary2$Ep, col='black', pch=16, ylab='', xlab='', las=1)
+
+mtext(expression(paste(CO[2], ' (', mu, 'M)', sep='')), 1, 1.5)
+mtext(expression(paste(epsilon[p], ' (', "\u2030", ')', sep='')), 2, 1.5)
+
+dev.off()
 
 IsotopeSub$Ep<-Ep_Smyntek(IsotopeSub$CO2uM)
 
