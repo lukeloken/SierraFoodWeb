@@ -55,6 +55,23 @@ colorset<-'Paired'
 colors<-c(brewer.pal(length(unique(IsotopeSub$Group))-1, colorset), 'black')
 
 
+png(paste0(box_dir, '/Figures/delC_delH.png'), units='in', width=7, height=7, res=400, bg='white')
+
+
+ggplot(IsotopeSub[is.finite(IsotopeSub$delH),], aes(x=delC, y=delH, group=Group)) + 
+  scale_shape_manual(values=rep(21:25, 5))  + 
+  scale_fill_manual(values = colors) + 
+  scale_colour_manual(values = colors) +
+  geom_smooth(method='lm', alpha=0.2, se=F, aes(fill=Group, colour=Group)) +
+  geom_jitter(size=2, width=0, aes(fill=Group, shape=Group)) + 
+  theme_bw() +
+  theme(plot.title = element_text(hjust=0.5))  +
+  theme(legend.position='bottom')
+
+dev.off()
+
+
+
 # colors<-color.palette(length(unique(merge_df$Station)))
 
 png(paste0(box_dir, '/Figures/delC_Elevation.png'), units='in', width=7, height=7, res=400, bg='white')
