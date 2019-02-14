@@ -285,7 +285,11 @@ ggplot(IsotopeSub[is.finite(IsotopeSub$delH_discrim),], aes_string("Group", "del
   scale_shape_manual(values=rep(21:25, 5))  + 
   scale_fill_manual(values = colors) + 
   scale_colour_manual(values = colors) +
+  # geom_hline(yintercept = c(-79, -173, -85), colour=colors[c(8, 6, 7)], linetype=2, size=1) + 
   geom_hline(yintercept = c(-79, -173, -85), colour=colors[c(8, 6, 7)], linetype=2, size=1) + 
+  geom_ribbon(x=c(0:(length(IsotopeSub[is.finite(IsotopeSub$delH_discrim),]$Group)-1)), ymin=(-79-16), ymax = (-79+16) , fill=colors[8], alpha=0.2) + 
+  geom_ribbon(x=c(0:(length(IsotopeSub[is.finite(IsotopeSub$delH_discrim),]$Group)-1)), ymin=(-173-26), ymax = (-173+26) , fill=colors[6], alpha=0.2) + 
+  geom_ribbon(x=c(0:(length(IsotopeSub[is.finite(IsotopeSub$delH_discrim),]$Group)-1)), ymin=(-85-19), ymax = (-85+19) , fill=colors[7], alpha=0.2) + 
   geom_jitter(size=1, width=.1, aes(colour=Group)) + 
   geom_boxplot(alpha=0.2, aes(fill=Group), outlier.shape=NA) +
   theme_bw() +
