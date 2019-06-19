@@ -38,11 +38,12 @@ IsotopePOM_deep$Depth_strata <- 'Epilimnion'
 IsotopePOM_deep$Depth_strata[IsotopePOM_deep$`Sample ID` %in% c(419,426)] <- 'Hypolimnion'
 
 Isotope_matchingformat <- IsotopePOM_deep %>%
-  dplyr::select(Lake, Depth_strata, delC) %>%
+  dplyr::select(Lake, Depth_strata, delC, Elevation) %>%
   rename(LakeName = Lake,
-         C13mean = delC) %>%
+         C13mean = delC, 
+         Elevation_m = Elevation) %>%
   mutate(Order = 2, 
-         Depth_strata = factor(Isotope_matchingformat$Depth_strata, c('Epilimnion', "Metalimnion", 'Hypolimnion')))
+         Depth_strata = factor(IsotopePOM_deep$Depth_strata, c('Epilimnion', "Metalimnion", 'Hypolimnion')))
 
 boxplot(Isotope_matchingformat$C13mean~ Isotope_matchingformat$Depth_strata)
 
@@ -64,22 +65,23 @@ time_df<-fig7_list[[1]]
 
 space_df2<-space_df %>%
   mutate(Depth_strata = factor(space_df$Depth_strata, c('Epilimnion', "Metalimnion", 'Hypolimnion'))) %>%
-  select(LakeName, Depth_strata, C13mean, C13sd) %>%
+  select(LakeName, Depth_strata, C13mean, C13sd, Elevation_m) %>%
   drop_na(Depth_strata) %>%
   group_by(LakeName, Depth_strata) %>%
-  arrange(LakeName, Depth_strata) %>%
-  mutate(Order = 1)
+  arrange(Elevation_m, LakeName, Depth_strata) %>%
+  mutate(Order = 1, 
+         Elevation_m = as.numeric(Elevation_m))
   
   
 space_df3<-bind_rows(space_df2, Isotope_matchingformat) %>%
-  arrange(Order, LakeName, Depth_strata)
+  arrange(Order, Elevation_m, LakeName, Depth_strata)
 
 
 name_table<-space_df3 %>%
-  dplyr::select(LakeName, Depth_strata, C13mean, Order) %>%
-  group_by(Order,LakeName) %>%
-  dplyr::arrange(Order, LakeName) %>%
-  summarize(mean=mean(C13mean), n=n())
+  dplyr::select(LakeName, Depth_strata, C13mean, Order, Elevation_m) %>%
+  group_by(Order, LakeName) %>%
+  summarize(mean=mean(C13mean), n=n(), Elevation_m = median(Elevation_m, na.rm=T)) %>%
+  dplyr::arrange(Order, Elevation_m, LakeName)
 
   name_table$LakeName <- gsub('Lake', '', name_table$LakeName)
   name_table$LakeName <- gsub('Reservoir', '', name_table$LakeName)
@@ -143,22 +145,23 @@ IsotopePOM
 IsotopePOM_surf<-dplyr::filter(IsotopePOM,  `Sample ID` != 419 & `Sample ID` != 426)
 
 Isotope_matchingformat_time <- IsotopePOM_surf %>%
-  dplyr::select(Lake, delC) %>%
+  dplyr::select(Lake, delC, Elevation) %>%
   rename(LakeName = Lake,
-         C13mean = delC) %>%
+         C13mean = delC, 
+         Elevation_m = Elevation) %>%
   mutate(Order = 2)
 
 
 time_df2<-time_df %>%
-  select(LakeName, C13mean, C13min, C13max, Duration, Sample_Freq) %>%
-  drop_na(C13mean) %>%
+  select(LakeName, C13mean, C13min, C13max, Duration, Sample_Freq, Elevation_m) %>%
+  drop_na(C13mean, Elevation_m) %>%
   group_by(LakeName) %>%
-  arrange(LakeName) %>%
+  arrange(Elevation_m, LakeName) %>%
   mutate(Order = 1)
 
 
 time_df3<-bind_rows(time_df2, Isotope_matchingformat_time) %>%
-  arrange(Order, LakeName)
+  arrange(Order,Elevation_m, LakeName)
 
 
 time_df3$LakeName <- gsub('Lake', '', time_df3$LakeName)
@@ -179,8 +182,8 @@ png(paste0(box_dir, '/Figures/Compare13CLiterature_Temporal.png'), units='in', w
 
 par(mfrow=c(1,1),mar=c(6,3,1,0.5), xpd=F, mgp=c(1.5,0.3,0), tck=-0.02)
 
-plot(time_df3$plot_nu, time_df3$C13mean, col='black', pch=15, ylim=c(-41, -12), xlim=c(0.5, max(time_df3$plot_nu)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
-error.bar(x=time_df3$plot_nu, y=time_df3$C13mean, upper.y=time_df3$C13max-time_df3$C13mean, lower.y=time_df3$C13mean-time_df3$C13min, lwd=1.5, length=0.03)
+plot(time_df3$plot_nu, time_df3$C13mean, col=colors[1], pch=15, ylim=c(-41, -12), xlim=c(0.5, max(time_df3$plot_nu)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
+error.bar(x=time_df3$plot_nu, y=time_df3$C13mean, upper.y=time_df3$C13max-time_df3$C13mean, lower.y=time_df3$C13mean-time_df3$C13min, lwd=1.5, length=0.03, col=colors[1])
 abline(v=max(time_df3$plot_nu[which(time_df3$Order<1.5)])+0.5, lwd=1)
 
 box(which='plot')
@@ -199,20 +202,23 @@ dev.off()
 #Double figure
 
 
-png(paste0(box_dir, '/Figures/Compare13CLiterature_TemporalAndVertical.png'), units='in', width=6, height=6, res=300, bg='white')
+png(paste0(box_dir, '/Figures/Compare13CLiterature_TemporalAndVertical.png'), units='in', width=6, height=6, res=400, bg='white')
 
-par(mfrow=c(2,1),mar=c(1,1,1,0.5), oma=c(4,1.5,0,0), xpd=F, mgp=c(1.5,0.3,0), tck=-0.02)
+par(mfrow=c(2,1),mar=c(1,1,.5,0.5), oma=c(4,1.5,0,0), xpd=F, mgp=c(1.5,0.3,0), tck=-0.02)
 
 
-plot(space_df3$plot_nu, space_df3$C13mean, col=space_df3$colour, pch=15, ylim=c(-51, -23), xlim=c(0.5, max(space_df3$plot_nu)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
+plot(space_df3$plot_nu, space_df3$C13mean, col=space_df3$colour, pch=22, ylim=c(-51, -23), xlim=c(0.5, max(space_df3$plot_nu)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
 error.bar(x=space_df3$plot_nu, y=space_df3$C13mean, upper.y=space_df3$C13sd, col=space_df3$colour, lwd=1.5, length=0.05)
+points(space_df3$plot_nu, space_df3$C13mean, col=space_df3$colour, pch=22, cex=1, bg='white')
+points(space_df3$plot_nu[which(space_df3$Order==2)], space_df3$C13mean[which(space_df3$Order==2)], col=space_df3$colour[which(space_df3$Order==2)], pch=22, cex=1, bg=space_df3$colour[which(space_df3$Order==2)])
+
 abline(v=space_df3$plot_nu[which(space_df3$Depth_strata=='Epilimnion' & space_df3$Order<1.5)]-0.5, lty=3)
 abline(v=max(space_df3$plot_nu[which(space_df3$Order<1.5)])+0.5)
 
 box(which='plot')
 
 axis(2, las=1, cex.axis=0.7)
-axis(1, at=name_table$axis_nu, labels=name_table$LakeName, cex.axis=0.65)
+axis(1, at=name_table$axis_nu, labels=name_table$LakeName, cex.axis=0.65, mgp=c(1.5,.1, 0))
 
 
 mtext( expression(paste(delta^{13}, "C POM (\u2030)")), side=2, line=0.25, outer=T)
@@ -221,8 +227,11 @@ mtext( expression(paste(delta^{13}, "C POM (\u2030)")), side=2, line=0.25, outer
 legend('bottomright', c(levels(space_df3$Depth_strata)), text.col=colors, bty='n', cex=0.65)
 
 
-plot(time_df3$plot_nu, time_df3$C13mean, col='black', pch=15, ylim=c(-41, -12), xlim=c(0.5, max(time_df3$plot_nu)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
-error.bar(x=time_df3$plot_nu, y=time_df3$C13mean, upper.y=time_df3$C13max-time_df3$C13mean, lower.y=time_df3$C13mean-time_df3$C13min, lwd=1.5, length=0.03)
+plot(time_df3$plot_nu, time_df3$C13mean, col=colors[1], pch=22, ylim=c(-41, -12), xlim=c(0.5, max(time_df3$plot_nu)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
+error.bar(x=time_df3$plot_nu, y=time_df3$C13mean, upper.y=time_df3$C13max-time_df3$C13mean, lower.y=time_df3$C13mean-time_df3$C13min, col=colors[1], lwd=1.5, length=0.03)
+points(time_df3$plot_nu, time_df3$C13mean, col=colors[1], pch=22, xlab='', cex=1, bg='white')
+points(time_df3$plot_nu[which(time_df3$Order==2)], time_df3$C13mean[which(time_df3$Order==2)], col=colors[1], pch=22, xlab='', cex=1, bg=colors[1])
+
 abline(v=max(time_df3$plot_nu[which(time_df3$Order<1.5)])+0.5, lwd=1)
 
 box(which='plot')
