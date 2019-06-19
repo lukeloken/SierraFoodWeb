@@ -83,6 +83,27 @@ name_table<-space_df3 %>%
   summarize(mean=mean(C13mean), n=n(), Elevation_m = median(Elevation_m, na.rm=T)) %>%
   dplyr::arrange(Order, Elevation_m, LakeName)
 
+
+numberoflakes<-nrow(name_table)
+space_df3$LakeNumber<-match(space_df3$LakeName, name_table$LakeName)
+
+
+  lake_nu<-1
+  space_df3$n<-NA
+  space_df3$plot_nu2<-NA
+ for (lake_nu in 1:nrow(name_table)){
+   LakeName<-name_table$LakeName[lake_nu]
+  space_df3$n[which(space_df3$LakeName==LakeName)]<-  rep(name_table$n[lake_nu],name_table$n[lake_nu]) 
+  if (name_table$n[lake_nu]==1){
+    vect=c(0)
+  } else if (name_table$n[lake_nu]==2){
+    vect=c(-.1, .1)
+  } else if (name_table$n[lake_nu]==3){
+    vect=c(-.2, 0, .2)}
+  space_df3$plot_nu2[which(space_df3$LakeName==LakeName)]<- lake_nu + vect
+ }
+  
+  
   name_table$LakeName <- gsub('Lake', '', name_table$LakeName)
   name_table$LakeName <- gsub('Reservoir', '', name_table$LakeName)
   name_table$LakeName <- gsub(' ', '', name_table$LakeName)
@@ -90,6 +111,7 @@ name_table<-space_df3 %>%
   name_table$cumulative_nu<-cumsum(name_table$n)
   name_table$axis_nu<-name_table$cumulative_nu-name_table$n/2 + .5
   
+
 space_df3$plot_nu<-1:nrow(space_df3)
 space_df3$colour_nu<-match(space_df3$Depth_strata, levels(space_df3$Depth_strata))
 space_df3$colour <- colors[space_df3$colour_nu]
@@ -117,15 +139,21 @@ png(paste0(box_dir, '/Figures/Compare13CLiterature_Vertical.png'), units='in', w
 
 par(mfrow=c(1,1),mar=c(3,3,1,0.5), xpd=F, mgp=c(1.5,0.3,0), tck=-0.02)
 
-plot(space_df3$plot_nu, space_df3$C13mean, col=space_df3$colour, pch=15, ylim=c(-51, -23), xlim=c(0.5, max(space_df3$plot_nu)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
-error.bar(x=space_df3$plot_nu, y=space_df3$C13mean, upper.y=space_df3$C13sd, col=space_df3$colour, lwd=1.5, length=0.05)
-abline(v=space_df3$plot_nu[which(space_df3$Depth_strata=='Epilimnion' & space_df3$Order<1.5)]-0.5, lty=3)
-abline(v=max(space_df3$plot_nu[which(space_df3$Order<1.5)])+0.5)
+# plot(space_df3$plot_nu, space_df3$C13mean, col=space_df3$colour, pch=15, ylim=c(-51, -23), xlim=c(0.5, max(space_df3$plot_nu)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
+# error.bar(x=space_df3$plot_nu, y=space_df3$C13mean, upper.y=space_df3$C13sd, col=space_df3$colour, lwd=1.5, length=0.05)
+# abline(v=space_df3$plot_nu[which(space_df3$Depth_strata=='Epilimnion' & space_df3$Order<1.5)]-0.5, lty=3)
+# abline(v=max(space_df3$plot_nu[which(space_df3$Order<1.5)])+0.5)
+
+plot(space_df3$plot_nu2, space_df3$C13mean, col=space_df3$colour, pch=15, ylim=c(-51, -23), xlim=c(0.5, max(space_df3$plot_nu2)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
+error.bar(x=space_df3$plot_nu2, y=space_df3$C13mean, upper.y=space_df3$C13sd, col=space_df3$colour, lwd=1.5, length=0.05)
+# abline(v=space_df3$plot_nu2[which(space_df3$Depth_strata=='Epilimnion' & space_df3$Order<1.5)]-0.5, lty=3)
+# abline(v=max(space_df3$plot_nu2[which(space_df3$Order<1.5)])+0.5)
+abline(v=length(which(name_table$Order==1))+0.5)
 
 box(which='plot')
 
 axis(2, las=1, cex.axis=0.7)
-axis(1, at=name_table$axis_nu, labels=name_table$LakeName, cex.axis=0.65)
+axis(1, at=1:nrow(name_table), labels=name_table$LakeName, cex.axis=0.65)
 
 
 mtext( expression(paste(delta^{13}, "C POM (\u2030)")), side=2, line=1.5)
@@ -207,18 +235,35 @@ png(paste0(box_dir, '/Figures/Compare13CLiterature_TemporalAndVertical.png'), un
 par(mfrow=c(2,1),mar=c(1,1,.5,0.5), oma=c(4,1.5,0,0), xpd=F, mgp=c(1.5,0.3,0), tck=-0.02)
 
 
-plot(space_df3$plot_nu, space_df3$C13mean, col=space_df3$colour, pch=22, ylim=c(-51, -23), xlim=c(0.5, max(space_df3$plot_nu)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
-error.bar(x=space_df3$plot_nu, y=space_df3$C13mean, upper.y=space_df3$C13sd, col=space_df3$colour, lwd=1.5, length=0.05)
-points(space_df3$plot_nu, space_df3$C13mean, col=space_df3$colour, pch=22, cex=1, bg='white')
-points(space_df3$plot_nu[which(space_df3$Order==2)], space_df3$C13mean[which(space_df3$Order==2)], col=space_df3$colour[which(space_df3$Order==2)], pch=22, cex=1, bg=space_df3$colour[which(space_df3$Order==2)])
+plot(space_df3$plot_nu2, space_df3$C13mean, col=space_df3$colour, pch=22, ylim=c(-51, -23), xlim=c(0.5, max(space_df3$plot_nu2)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
+error.bar(x=space_df3$plot_nu2, y=space_df3$C13mean, upper.y=space_df3$C13sd, col=space_df3$colour, lwd=1.5, length=0.05)
 
-abline(v=space_df3$plot_nu[which(space_df3$Depth_strata=='Epilimnion' & space_df3$Order<1.5)]-0.5, lty=3)
-abline(v=max(space_df3$plot_nu[which(space_df3$Order<1.5)])+0.5)
+
+points(space_df3$plot_nu2, space_df3$C13mean, col=space_df3$colour, pch=22, cex=1, bg='white')
+points(space_df3$plot_nu2[which(space_df3$Order==2)], space_df3$C13mean[which(space_df3$Order==2)], col=space_df3$colour[which(space_df3$Order==2)], pch=22, cex=1, bg=space_df3$colour[which(space_df3$Order==2)])
+
+
+# abline(v=space_df3$plot_nu2[which(space_df3$Depth_strata=='Epilimnion' & space_df3$Order<1.5)]-0.5, lty=3)
+# abline(v=max(space_df3$plot_nu2[which(space_df3$Order<1.5)])+0.5)
+abline(v=length(which(name_table$Order==1))+0.5)
 
 box(which='plot')
 
 axis(2, las=1, cex.axis=0.7)
-axis(1, at=name_table$axis_nu, labels=name_table$LakeName, cex.axis=0.65, mgp=c(1.5,.1, 0))
+axis(1, at=1:nrow(name_table), labels=name_table$LakeName, cex.axis=0.65, mgp=c(1.5,.1, 0))
+
+# plot(space_df3$plot_nu, space_df3$C13mean, col=space_df3$colour, pch=22, ylim=c(-51, -23), xlim=c(0.5, max(space_df3$plot_nu)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
+# error.bar(x=space_df3$plot_nu, y=space_df3$C13mean, upper.y=space_df3$C13sd, col=space_df3$colour, lwd=1.5, length=0.05)
+# points(space_df3$plot_nu, space_df3$C13mean, col=space_df3$colour, pch=22, cex=1, bg='white')
+# points(space_df3$plot_nu[which(space_df3$Order==2)], space_df3$C13mean[which(space_df3$Order==2)], col=space_df3$colour[which(space_df3$Order==2)], pch=22, cex=1, bg=space_df3$colour[which(space_df3$Order==2)])
+# 
+# abline(v=space_df3$plot_nu[which(space_df3$Depth_strata=='Epilimnion' & space_df3$Order<1.5)]-0.5, lty=3)
+# abline(v=max(space_df3$plot_nu[which(space_df3$Order<1.5)])+0.5)
+# 
+# box(which='plot')
+# 
+# axis(2, las=1, cex.axis=0.7)
+# axis(1, at=name_table$axis_nu, labels=name_table$LakeName, cex.axis=0.65, mgp=c(1.5,.1, 0))
 
 
 mtext( expression(paste(delta^{13}, "C POM (\u2030)")), side=2, line=0.25, outer=T)
