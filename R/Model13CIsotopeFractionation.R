@@ -8,6 +8,10 @@ brown.trans <- adjustcolor('brown', alpha.f=0.6)
 gray.trans <- adjustcolor('gray', alpha.f=0.7)
 black.trans <- adjustcolor('black',alpha.f=0.7)
 
+# ylims <- c(-300, 80)
+xlims <- c(1400,3700)
+xaxint <- 400
+
 
 # Isotope Fractionation Model
 
@@ -20,14 +24,14 @@ CalculateEp <- function(C13Aq, C13B){
 CalculateEp(-8,-30)
 
 
-CassarEp <- function(){
-  
-  
-  del13C_Phyto<-1000*(del13C_Sample/del13C_PDB - 1)
-  
-}
+# CassarEp <- function(){
+#   
+#   
+#   del13C_Phyto<-1000*(del13C_Sample/del13C_PDB - 1)
+#   
+# }
 
-Ep <- ( del13C_CO2 - del13C_P )/(1 + del13C_P/1000)
+# Ep <- ( del13C_CO2 - del13C_P )/(1 + del13C_P/1000)
 
 Wang_Ep<-function(del13C_CO2, del13C_POC){
 Ep<- 1000*(del13C_CO2 - del13C_POC)/(1000 + del13C_POC)
@@ -97,31 +101,40 @@ terrveg.sd<-sd(LakeSummary2$`Terrestrial veg`,na.rm=TRUE)
 pom.sd<-sd(LakeSummary2$POM,na.rm=TRUE)
 dic.sd<-sd(LakeSummary2$DIC,na.rm=TRUE)
 money.sd<-sd(LakeSummary2$Money,na.rm=TRUE)
+POMpred.sd<-sd(LakeSummary2$PhytoExpected_Epi,na.rm=TRUE)
+
+CO2Lims<-c(0,50)
+ElevLims<-c(1400, 3700)
 
 
+#Figure 3 delC
 
-png(paste0(box_dir, '/Figures/FoodWebPaper_Figure3_d13C.png'), units='in', width=5.5, height=10, res=300, bg='white')
+png(paste0(box_dir, '/Figures/FoodWebPaper_Figure3_d13C.png'), units='in', width=5.5, height=10.5, res=300, bg='white')
 
-par(mfrow=c(3,1),mar=c(3.5,3,1,0.5),oma=c(2,2,1,1), xpd=F)
+par(mfrow=c(3,1),mar=c(3,3,1,0.5),oma=c(2,2,1,1), xpd=F, cex=1)
+
+# par(mfrow=c(3,1),mar=c(3.5,3,1,0.5),oma=c(2,2,1,1), xpd=F)
 
 #plot 1
 
-plot(LakeSummary2$Elevation, LakeSummary2$`CO2 uM`, ylab='', xlab='', las=1, col='black', cex=1.4, axes=F,pch=16)
+plot(LakeSummary2$Elevation, LakeSummary2$`CO2 uM`, ylab='', xlab='', las=1, col='black', cex=1.5, pch=16, yaxs='i',xaxs='i', axes=F,ann=F, xlim=ElevLims, ylim=CO2Lims)
+
 abline(lm( LakeSummary2$`CO2 uM` ~ LakeSummary2$Elevation ), lwd=2)
 
 axis(side=2,lwd=2,las=2, cex.axis=1.2,col.axis='black')
 box(lwd=2)
 mtext(side=1, line=2.7, expression(paste("Elevation (m)")), cex=1.2)
-axis(side=1, lwd=2, cex.axis=1.2,col.axis='black')
+axis(side=1, lwd=2, cex.axis=1.2,col.axis='black', at=seq(ElevLims[1],ElevLims[2],by=400))
+
 mtext(side=2, line=2.9, expression(paste(CO[2], " (", mu, "M)")), cex=1.2)
 
 #plot 2
 
-plot(LakeSummary2$`CO2 uM`, LakeSummary2$Ep, ylab='', xlab='', las=1, col='black', type='p', cex=1.4, axes=F, pch=16)
+plot(LakeSummary2$`CO2 uM`, LakeSummary2$Ep, ylab='', xlab='', las=1, col='black', type='p', cex=1.5, axes=F, pch=16, ylim=c(6,18), yaxs='i', xaxs='i', xlim=CO2Lims)
 lines(seq(0.01, 50, 0.1), Ep_Smyntek(seq(0.01, 50, 0.1)))
 
 
-axis(side=2,lwd=2,las=2, cex.axis=1.2,col.axis='black')
+axis(side=2,lwd=2,las=2, cex.axis=1.2,col.axis='black', at=seq(6,18,4))
 box(lwd=2)
 mtext(side=2, line=2.9, expression(paste(epsilon[p], ' (', "\u2030", ')', sep='')), cex=1.2)
 axis(side=1, lwd=2, cex.axis=1.2,col.axis='black')
@@ -130,12 +143,12 @@ mtext(side=1, line=2.7, expression(paste(CO[2], " (", mu, "M)")), cex=1.2)
 
 #plot 3
 
-plot(LakeSummary2$`CO2 uM`, LakeSummary2$'d13C DIC', ylim=c(-38,-5), ylab='', xlab='', las=1, col=blue.trans, type='n', cex=1.4, axes=F)
+plot(LakeSummary2$`CO2 uM`, LakeSummary2$'d13C DIC', ylim=c(-40,3), ylab='', xlab='', las=1, col=blue.trans, type='n', cex=1.5, axes=F, xlim=CO2Lims, xaxs='i', yaxs='i')
 
 polygon(x=c(co2_x[,1],rev(co2_x[,1])),y=c((Ter_pred[,1]-terrveg.sd), rev((Ter_pred[,1]+terrveg.sd))),col=green.trans,border=NA)
 # polygon(x=c(co2_x[,1],rev(co2_x[,1])),y=c((DIC_pred[,1]-dic.sd), rev((DIC_pred[,1]+dic.sd))),col=gray.trans,border=NA)
 polygon(x=c(co2_x[,1],rev(co2_x[,1])),y=c((Money_pred[,1]-money.sd), rev((Money_pred[,1]+money.sd))),col=gray.trans,border=NA)
-polygon(x=c(co2_x[,1],rev(co2_x[,1])),y=c((Phyto_pred[,1]-2), rev((Phyto_pred[,1]+3))),col=aquatic.trans,border=NA)
+polygon(x=c(co2_x[,1],rev(co2_x[,1])),y=c((Phyto_pred[,1]-POMpred.sd), rev((Phyto_pred[,1]+POMpred.sd))),col=aquatic.trans,border=NA)
 
 
 abline(lm( LakeSummary2$'Terrestrial veg' ~ LakeSummary2$`CO2 uM` ), col=green.trans, lwd=2)
@@ -144,19 +157,22 @@ abline(lm( LakeSummary2$Money ~ LakeSummary2$`CO2 uM` ), col=gray.trans, lwd=2)
 abline(lm( LakeSummary2$PhytoExpected_Epi ~ LakeSummary2$`CO2 uM` ), col=aquatic.trans, lwd=2)
 abline(lm( LakeSummary2$POM ~ LakeSummary2$`CO2 uM` ), col="black", lwd=2)
 
+# arrows(x0=2600,y0=-74,x1=2600,y1=-222, code=2,arr.adj=1,length=0.2)
+# text(x=2660,y=-120,expression(epsilon[h]),cex=1.2)
+
 x_arrow<-50
-arrows(x0=co2_x[x_arrow,1], y0=Money_pred[x_arrow,1], y1=Phyto_pred[x_arrow,1], length=0.1, lty=1, col='black')
-text(co2_x[x_arrow,1], mean(c(Money_pred[x_arrow,1], Phyto_pred[x_arrow,1])), expression(paste(epsilon[p])), pos=4, cex=2)
+arrows(x0=co2_x[x_arrow,1], y0=Money_pred[x_arrow,1], y1=Phyto_pred[x_arrow,1], length=0.2, lty=1, col='black', arr.adj=1)
+text(co2_x[x_arrow,1], mean(c(Money_pred[x_arrow,1], Phyto_pred[x_arrow,1])), expression(paste(epsilon[p])), pos=4, cex=1.2)
 # points(LakeSummary2$`CO2 uM`, LakeSummary2$DOC, bg='orange', pch=22)
 # points(LakeSummary2$`CO2 uM`, LakeSummary2$`Sediment abyssal`, bg='brown', pch=23)
 # points(LakeSummary2$`CO2 uM`, LakeSummary2$Zooplankton, bg='purple', pch=24)
 # points(LakeSummary2$`CO2 uM`, LakeSummary2$'d13C DIC', col=blue.trans, pch=16, cex=1.4)
 
-points(LakeSummary2$`CO2 uM`, LakeSummary2$Money, col=gray.trans, pch=16, cex=1.4)
+points(LakeSummary2$`CO2 uM`, LakeSummary2$Money, col=gray.trans, pch=16, cex=1.5)
 
-points(LakeSummary2$`CO2 uM`, LakeSummary2$PhytoExpected_Epi, pch=21, cex=1.4, col=green.trans)
-points(LakeSummary2$`CO2 uM`, LakeSummary2$'Terrestrial veg', pch=16, cex=1.4, col=green.trans)
-points(LakeSummary2$`CO2 uM`, LakeSummary2$POM, col='black', pch=16, cex=1.4)
+points(LakeSummary2$`CO2 uM`, LakeSummary2$PhytoExpected_Epi, pch=21, cex=1.5, col=green.trans, lwd=1.5)
+points(LakeSummary2$`CO2 uM`, LakeSummary2$'Terrestrial veg', pch=16, cex=1.5, col=green.trans)
+points(LakeSummary2$`CO2 uM`, LakeSummary2$POM, col=black.trans, pch=16, cex=1.5)
 
 
 legend('topleft', legend=c('CO2','Terr Veg','Phyto','POM'),pch=21,col=c(gray.trans,green.trans,green.trans,black.trans),pt.bg=c(gray.trans,green.trans,aquatic.trans,black.trans), cex=1.1 ,horiz=T)
