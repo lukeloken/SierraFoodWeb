@@ -128,6 +128,8 @@ axis(side=1, lwd=2, cex.axis=1.2,col.axis='black', at=seq(ElevLims[1],ElevLims[2
 
 mtext(side=2, line=2.9, expression(paste(CO[2], " (", mu, "M)")), cex=1.2)
 
+legend('topleft', c('(a)'), bty='n', adj=1, cex=1.2)
+
 #plot 2
 
 plot(LakeSummary2$`CO2 uM`, LakeSummary2$Ep, ylab='', xlab='', las=1, col='black', type='p', cex=1.5, axes=F, pch=16, ylim=c(6,18), yaxs='i', xaxs='i', xlim=CO2Lims)
@@ -140,6 +142,7 @@ mtext(side=2, line=2.9, expression(paste(epsilon[p], ' (', "\u2030", ')', sep=''
 axis(side=1, lwd=2, cex.axis=1.2,col.axis='black')
 mtext(side=1, line=2.7, expression(paste(CO[2], " (", mu, "M)")), cex=1.2)
 
+legend('topleft', c('(b)'), bty='n', adj=1, cex=1.2)
 
 #plot 3
 
@@ -160,19 +163,23 @@ abline(lm( LakeSummary2$POM ~ LakeSummary2$`CO2 uM` ), col="black", lwd=2)
 # arrows(x0=2600,y0=-74,x1=2600,y1=-222, code=2,arr.adj=1,length=0.2)
 # text(x=2660,y=-120,expression(epsilon[h]),cex=1.2)
 
-x_arrow<-50
-arrows(x0=co2_x[x_arrow,1], y0=Money_pred[x_arrow,1], y1=Phyto_pred[x_arrow,1], length=0.2, lty=1, col='black', arr.adj=1)
+x_arrow <- 50
+arrows(x0=co2_x[x_arrow,1], y0=Money_pred[x_arrow,1], y1=Phyto_pred[x_arrow,1], length=0.2, lty=1, col='black')
 text(co2_x[x_arrow,1], mean(c(Money_pred[x_arrow,1], Phyto_pred[x_arrow,1])), expression(paste(epsilon[p])), pos=4, cex=1.2)
 # points(LakeSummary2$`CO2 uM`, LakeSummary2$DOC, bg='orange', pch=22)
 # points(LakeSummary2$`CO2 uM`, LakeSummary2$`Sediment abyssal`, bg='brown', pch=23)
 # points(LakeSummary2$`CO2 uM`, LakeSummary2$Zooplankton, bg='purple', pch=24)
 # points(LakeSummary2$`CO2 uM`, LakeSummary2$'d13C DIC', col=blue.trans, pch=16, cex=1.4)
+# points(IsotopeSub$`CO2 uM`[which(IsotopeSub$`Sample type`== 'Terrestrial veg')], IsotopeSub$delC[which(IsotopeSub$`Sample type`== 'Terrestrial veg')], pch=16, cex=1.5, col=green.trans)
+points(LakeSummary2$`CO2 uM`, LakeSummary2$'Terrestrial veg', pch=16, cex=1.5, col=green.trans)
+
 
 points(LakeSummary2$`CO2 uM`, LakeSummary2$Money, col=gray.trans, pch=16, cex=1.5)
-
 points(LakeSummary2$`CO2 uM`, LakeSummary2$PhytoExpected_Epi, pch=21, cex=1.5, col=green.trans, lwd=1.5)
-points(LakeSummary2$`CO2 uM`, LakeSummary2$'Terrestrial veg', pch=16, cex=1.5, col=green.trans)
 points(LakeSummary2$`CO2 uM`, LakeSummary2$POM, col=black.trans, pch=16, cex=1.5)
+
+
+legend('topleft', c('(c)'), bty='n', adj=c(1, 3), cex=1.2)
 
 
 legend('topleft', legend=c('CO2','Terr Veg','Phyto','POM'),pch=21,col=c(gray.trans,green.trans,green.trans,black.trans),pt.bg=c(gray.trans,green.trans,aquatic.trans,black.trans), cex=1.1 ,horiz=T)
