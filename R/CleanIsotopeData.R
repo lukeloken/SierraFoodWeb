@@ -143,9 +143,6 @@ dev.off()
 
 
 #Vs CO2 concentration
-
-
-
 png(paste0(box_dir, '/Figures/delC_vCO2facet.png'), units='in', width=10, height=10, res=400, bg='white')
 
 
