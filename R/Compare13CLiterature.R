@@ -23,6 +23,9 @@ source('R/g_legend.R')
 source('R/PlotErrorBar.R')
 
 
+#Need to run ('R/CleanIsotopeData.R')
+
+
 # Box folder where data and outputs are stored
 box_dir<-'C:/Users/lcloken/Box/SadroLab/SierraFoodWeb'
 
@@ -159,7 +162,7 @@ axis(1, at=1:nrow(name_table), labels=name_table$LakeName, cex.axis=0.65)
 mtext( expression(paste(delta^{13}, "C POM (\u2030)")), side=2, line=1.5)
 mtext( "Lake", side=1, line=1.5)
 
-legend('bottomright', c(levels(space_df3$Depth_strata)), text.col=colors, bty='n', cex=0.65)
+legend('bottomright', c(levels(space_df3$Depth_strata)), text.col=colors, bty='n', cex=1)
 
 dev.off()
 
@@ -252,24 +255,15 @@ box(which='plot')
 axis(2, las=1, cex.axis=0.7)
 axis(1, at=1:nrow(name_table), labels=name_table$LakeName, cex.axis=0.65, mgp=c(1.5,.1, 0))
 
-# plot(space_df3$plot_nu, space_df3$C13mean, col=space_df3$colour, pch=22, ylim=c(-51, -23), xlim=c(0.5, max(space_df3$plot_nu)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
-# error.bar(x=space_df3$plot_nu, y=space_df3$C13mean, upper.y=space_df3$C13sd, col=space_df3$colour, lwd=1.5, length=0.05)
-# points(space_df3$plot_nu, space_df3$C13mean, col=space_df3$colour, pch=22, cex=1, bg='white')
-# points(space_df3$plot_nu[which(space_df3$Order==2)], space_df3$C13mean[which(space_df3$Order==2)], col=space_df3$colour[which(space_df3$Order==2)], pch=22, cex=1, bg=space_df3$colour[which(space_df3$Order==2)])
-# 
-# abline(v=space_df3$plot_nu[which(space_df3$Depth_strata=='Epilimnion' & space_df3$Order<1.5)]-0.5, lty=3)
-# abline(v=max(space_df3$plot_nu[which(space_df3$Order<1.5)])+0.5)
-# 
-# box(which='plot')
-# 
-# axis(2, las=1, cex.axis=0.7)
-# axis(1, at=name_table$axis_nu, labels=name_table$LakeName, cex.axis=0.65, mgp=c(1.5,.1, 0))
-
 
 mtext( expression(paste(delta^{13}, "C POM (\u2030)")), side=2, line=0.25, outer=T)
 # mtext( "Lake", side=1, line=1.5)
 
-legend('bottomright', c(levels(space_df3$Depth_strata)), text.col=colors, bty='n', cex=0.65)
+legend('bottomright', c(levels(space_df3$Depth_strata)), text.col=colors, bty='n', cex=1)
+# legend('bottomright', c(levels(space_df3$Depth_strata)), text.col=colors, bty='n', cex=0.65)
+
+legend('topleft', c('(a)'), bty='n', adj=1, cex=0.65)
+
 
 
 plot(time_df3$plot_nu, time_df3$C13mean, col=colors[1], pch=22, ylim=c(-41, -12), xlim=c(0.5, max(time_df3$plot_nu)+0.5), xaxs='i', axes=F, ylab='', xlab='', cex=1)
@@ -286,6 +280,8 @@ axis(1, at=time_df3$plot_nu, labels=time_df3$LakeName, cex.axis=0.65, las=3)
 
 # mtext( expression(paste(delta^{13}, "C POM (\u2030)")), side=2, line=1.5)
 mtext( "Lake", side=1, line=3.5)
+
+legend('topleft', c('(b)'), bty='n', adj=(1), cex=0.65)
 
 dev.off()
 
